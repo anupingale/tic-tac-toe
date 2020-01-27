@@ -17,12 +17,20 @@
 
 (defn make-move [state] (update-in state [:current-player :moves] #(conj % (get-valid-move state))))
 
+(defn print-move [player-1-details, player-2-details, move]
+  (cond
+    ((:moves player-1-details) move) (get player-1-details :symbol)
+    ((:moves player-2-details) move) (get player-2-details :symbol)
+    :else " "))
+
+(defn print-board [game] (println (clojure.string/join "\n" (map (partial clojure.string/join " | ") (partition 3 (map (partial print-move (:next-player game) (:current-player game)) (range 1 10)))))))
 (defn display-result [player] (str "Winner of the game is : " (:name player)))
 
 (defn game [state] (loop [state state]
-                     (if (has-won? (:moves (:next-player state)))
-                       (display-result (:next-player state))
-                       (recur (swap (make-move state))))))
+                     (do (print-board state)
+                         (if (has-won? (:moves (:next-player state)))
+                           (display-result (:next-player state))
+                           (recur (swap (make-move state)))))))
 
-(game {:next-player {:name "sai", :moves #{}} :current-player {:name "anu", :moves #{}}})
+(game {:next-player {:name "sai", :moves #{}, :symbol "X"} :current-player {:name "anu", :moves #{}, :symbol "O"}})
 
